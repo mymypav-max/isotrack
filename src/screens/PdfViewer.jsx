@@ -75,7 +75,7 @@ export default function PdfViewer({
             setPageNum(1)
           }
         })
-        .catch(() => { if (!cancelled) setError('Impossible de lire ce fichier PDF.') })
+        .catch(e => { if (!cancelled) setError(`PDF: ${e?.name} — ${e?.message}`) })
     })
     return () => { cancelled = true }
   }, [document?.id])
@@ -124,9 +124,9 @@ export default function PdfViewer({
     setLoading(false)
   } catch (e) {
     if (e?.name !== 'RenderingCancelledException') {
-      console.error('Render error:', e)
-      setError('Erreur de rendu — essaie un fichier PDF plus léger.')
-    }
+  console.error('Render error:', e)
+  setError(`Erreur: ${e?.name} — ${e?.message}`)
+}
   }
 }
   // ── Long press ──────────────────────────────────────────────
