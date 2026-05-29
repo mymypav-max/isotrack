@@ -5,7 +5,7 @@ import { local } from '../services/localDb'
 import { Pill } from './ProjectDetail'
 import { STATUS, CRITICALITY } from '../constants'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
 
 const LONG_PRESS_MS  = 650
 const MOVE_THRESHOLD = 12

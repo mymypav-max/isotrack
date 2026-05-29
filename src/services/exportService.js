@@ -2,7 +2,7 @@ import { jsPDF } from 'jspdf'
 import * as pdfjsLib from 'pdfjs-dist'
 import { Engine } from './syncEngine'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs'
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
 
 // ── Constantes ────────────────────────────────────────────────
 const W = 210, H = 297, M = 14
