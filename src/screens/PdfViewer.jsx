@@ -46,12 +46,27 @@ export default function PdfViewer({
     setPdfDoc(null)
     let cancelled = false
     Engine.getDocumentFile(document).then(fileData => {
-      if (cancelled || !fileData) {
-        if (!fileData) setError('Fichier introuvable.')
-        return
-      }
-      const data = new Uint8Array(fileData)
-      const task = pdfjsLib.getDocument({ data })
+  if (cancelled || !fileData) {
+    if (!fileData) setError('Fichier introuvable.')
+    return
+  }
+  // Copie l'ArrayBuffer pour éviter le bug iOS (detached buffer)
+  let buffer
+  try {
+    if (fileData instanceof ArrayBuffer) {
+      buffer = fileData.slice(0)
+    } else if (ArrayBuffer.isView(fileData)) {
+      buffer = fileData.buffer.slice(fileData.byteOffset, fileData.byteOffset + fileData.byteLength)
+    } else {
+      setError('Format de fichier non supporté.')
+      return
+    }
+  } catch(e) {
+    setError('Impossible de lire ce fichier PDF.')
+    return
+  }
+  const data = new Uint8Array(buffer)
+  const task = pdfjsLib.getDocument({ data })
       task.promise
         .then(pdf => {
           if (!cancelled) {
