@@ -93,17 +93,33 @@ export default function ProjectsList({ onSelect }) {
               <label className="form-label">Photo du chantier</label>
               {preview ? (
                 <div style={{ position: 'relative', marginBottom: 8 }}>
-                  <img src={preview} alt="Aperçu"
-                    style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 10, display: 'block' }} />
-                  <button
-                    onClick={() => { setPreview(null); set('photoData', null) }}
-                    style={{
-                      position: 'absolute', top: 8, right: 8,
-                      background: 'rgba(0,0,0,0.55)', color: 'white',
-                      border: 'none', borderRadius: '50%', width: 28, height: 28,
-                      cursor: 'pointer', fontSize: 16, lineHeight: '28px', textAlign: 'center',
-                    }}>×</button>
-                </div>
+  <div style={{
+    width: '100%',
+    aspectRatio: '1 / 1',
+    background: '#1E293B',
+    borderRadius: 10,
+    overflow: 'hidden',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}>
+    <img src={preview} alt="Aperçu"
+      style={{
+        maxWidth: '100%',
+        maxHeight: '100%',
+        objectFit: 'contain',
+        display: 'block',
+      }} />
+  </div>
+  <button
+    onClick={() => { setPreview(null); set('photoData', null) }}
+    style={{
+      position: 'absolute', top: 8, right: 8,
+      background: 'rgba(0,0,0,0.55)', color: 'white',
+      border: 'none', borderRadius: '50%', width: 28, height: 28,
+      cursor: 'pointer', fontSize: 16, lineHeight: '28px', textAlign: 'center',
+    }}>×</button>
+</div>
               ) : (
                 <label style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
