@@ -5,10 +5,7 @@ import { local } from '../services/localDb'
 import { Pill } from './ProjectDetail'
 import { STATUS, CRITICALITY } from '../constants'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).href
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
 
 const LONG_PRESS_MS  = 650
 const MOVE_THRESHOLD = 12
