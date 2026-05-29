@@ -88,13 +88,18 @@ export default function PdfViewer({
 
   // ── Auto-échelle ────────────────────────────────────────────
   useEffect(() => {
-    if (!pdfDoc || !containerRef.current) return
-    pdfDoc.getPage(1).then(page => {
-      const vp = page.getViewport({ scale: 1 })
-      const w  = containerRef.current.clientWidth - 48
-      setScale(Math.min(+(w / vp.width).toFixed(2), 2))
-    })
-  }, [pdfDoc])
+  if (!pdfDoc || !containerRef.current) return
+  pdfDoc.getPage(1).then(page => {
+    const vp  = page.getViewport({ scale: 1 })
+    const w   = containerRef.current.clientWidth - 48
+    let s     = Math.min(+(w / vp.width).toFixed(2), 1.5)
+    // Limite iOS Safari : canvas max ~4096px
+    const MAX = 3000
+    if (vp.width  * s > MAX) s = MAX / vp.width
+    if (vp.height * s > MAX) s = Math.min(s, MAX / vp.height)
+    setScale(Math.max(0.25, +s.toFixed(2)))
+  })
+}, [pdfDoc])
 
   // ── Rendu page ──────────────────────────────────────────────
   useEffect(() => {
@@ -103,24 +108,27 @@ export default function PdfViewer({
   }, [pdfDoc, pageNum, scale])
 
   const renderPage = async () => {
-    try {
-      const page     = await pdfDoc.getPage(pageNum)
-      const viewport = page.getViewport({ scale })
-      const canvas   = canvasRef.current
-      if (!canvas) return
-      const ctx      = canvas.getContext('2d')
-      canvas.width   = viewport.width
-      canvas.height  = viewport.height
-      setCanvasSize({ w: viewport.width, h: viewport.height })
-      if (renderTask.current) renderTask.current.cancel()
-      renderTask.current = page.render({ canvasContext: ctx, viewport })
-      await renderTask.current.promise
-      setLoading(false)
-    } catch (e) {
-      if (e?.name !== 'RenderingCancelledException') setError('Erreur de rendu.')
+  try {
+    const page     = await pdfDoc.getPage(pageNum)
+    const viewport = page.getViewport({ scale })
+    const canvas   = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d', { willReadFrequently: false })
+    if (!ctx) { setError('Canvas non disponible sur cet appareil.'); return }
+    canvas.width   = Math.floor(viewport.width)
+    canvas.height  = Math.floor(viewport.height)
+    setCanvasSize({ w: canvas.width, h: canvas.height })
+    if (renderTask.current) renderTask.current.cancel()
+    renderTask.current = page.render({ canvasContext: ctx, viewport })
+    await renderTask.current.promise
+    setLoading(false)
+  } catch (e) {
+    if (e?.name !== 'RenderingCancelledException') {
+      console.error('Render error:', e)
+      setError('Erreur de rendu — essaie un fichier PDF plus léger.')
     }
   }
-
+}
   // ── Long press ──────────────────────────────────────────────
   const startPress = (x, y) => {
     timerRef.current = setTimeout(() => {
