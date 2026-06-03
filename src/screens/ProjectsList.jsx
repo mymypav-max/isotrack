@@ -243,38 +243,46 @@ const handleCropCancel = () => {
 
           {projects.map(p => (
   <div key={p.id}
-    style={{ background: 'white', border: '0.5px solid var(--border)', borderRadius: 12, marginBottom: 12, overflow: 'hidden', cursor: 'pointer' }}
+    style={{ background: 'white', border: '0.5px solid var(--border)', borderRadius: 12, marginBottom: 10, overflow: 'hidden', cursor: 'pointer' }}
     onClick={() => onSelect(p)}>
 
-    {/* Barre accent couleur */}
-    {p.photoData ? (
-      <img src={p.photoData} alt={p.name}
-        style={{ width: '100%', height: 130, objectFit: 'cover', display: 'block' }} />
-    ) : (
-      <div style={{ height: 4, background: 'linear-gradient(90deg, #09354C, #EA580C)' }} />
-    )}
+    {/* Barre accent fine */}
+    <div style={{ height: 3, background: p.photoData ? 'linear-gradient(90deg,#09354C,#EA580C)' : 'linear-gradient(90deg,#09354C,#EA580C)' }} />
 
-    <div style={{ padding: '13px 16px 15px' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 5 }}>{p.name}</div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', fontSize: 12, color: 'var(--muted)' }}>
-            {p.client         && <span>👤 {p.client}</span>}
-            {p.constructionType && <span>🏭 {p.constructionType}</span>}
-            {p.address         && <span>📍 {p.address}</span>}
-          </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px' }}>
+
+      {/* Photo miniature ou initiales */}
+      <div style={{
+        width: 52, height: 52, borderRadius: 10, flexShrink: 0, overflow: 'hidden',
+        background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        {p.photoData
+          ? <img src={p.photoData} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          : <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--blue)' }}>
+              {p.name.slice(0,2).toUpperCase()}
+            </span>
+        }
+      </div>
+
+      {/* Infos */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {p.name}
         </div>
-        <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-          <button className="btn btn-xs btn-outline" onClick={() => openEdit(p)}>✏️</button>
-          <button className="btn btn-xs btn-danger" onClick={() => deleteProject(p.id)}>🗑</button>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 10px', fontSize: 12, color: 'var(--muted)' }}>
+          {p.client          && <span>👤 {p.client}</span>}
+          {p.constructionType && <span>🏭 {p.constructionType}</span>}
+          {p.address          && <span>📍 {p.address}</span>}
         </div>
       </div>
-      {p.description && (
-        <p style={{ fontSize: 12, color: 'var(--subtle)', marginTop: 8, lineHeight: 1.5,
-          overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-          {p.description}
-        </p>
-      )}
+
+      {/* Actions */}
+      <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 5, flexShrink: 0, alignItems: 'center' }}>
+        <button className="btn btn-xs btn-outline" onClick={() => openEdit(p)}>✏️</button>
+        <button className="btn btn-xs btn-danger" onClick={() => deleteProject(p.id)}>🗑</button>
+        <span style={{ color: 'var(--border)', fontSize: 18, marginLeft: 4 }}>›</span>
+      </div>
+
     </div>
   </div>
 ))}
