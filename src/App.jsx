@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ProjectsList from './screens/ProjectsList'
 import ProjectDetail from './screens/ProjectDetail'
 import { syncAll } from './services/syncEngine'
