@@ -18,15 +18,15 @@ function BrandLogo() {
   return (
     <div className="brand">
       <svg width="32" height="38" viewBox="0 0 32 38" fill="none" aria-hidden="true">
-        <path d="M16 2C8 2 4 9 4 14C4 22 10 29 16 36C22 29 28 22 28 14C28 9 24 2 16 2Z" fill="#09354C"/>
-        <circle cx="16" cy="13" r="5.5" stroke="#EA580C" strokeWidth="2" fill="none"/>
+        <path d="M16 2C8 2 4 9 4 14C4 22 10 29 16 36C22 29 28 22 28 14C28 9 24 2 16 2Z" fill="#EA580C"/>
+        <circle cx="16" cy="13" r="5.5" stroke="white" strokeWidth="2" fill="none"/>
         <circle cx="16" cy="13" r="2" fill="#EA580C"/>
         <line x1="16" y1="6" x2="16" y2="9" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
         <line x1="16" y1="17" x2="16" y2="20" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
         <line x1="9" y1="13" x2="12" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
         <line x1="20" y1="13" x2="23" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
       </svg>
-      <span className="brand-text">Iso<em>Track</em></span>
+      <span className="brand-text" style={{ color: '#EA580C' }}>IsoTrack</span>
     </div>
   )
 }
@@ -111,200 +111,162 @@ const handleCropCancel = () => {
   return (
   <>
     {cropSrc && (
-      <CropModal
-        src={cropSrc}
-        onApply={handleCropApply}
-        onCancel={handleCropCancel}
-      />
+      <CropModal src={cropSrc} onApply={handleCropApply} onCancel={handleCropCancel}/>
     )}
     <div className="app">
-      {/* TopBar */}
-<div className="topbar">
-  <BrandLogo />
-  <div className="topbar-divider" />
-  <div className="topbar-title">
-    <p style={{ color: 'var(--muted)', fontSize: 13 }}>Projets</p>
-  </div>
-  <button className="btn btn-primary btn-sm" onClick={openCreate}>+ Nouveau projet</button>
-</div>
 
-      {/* Formulaire */}
-      {showForm && (
-  <div className="form-panel" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 64px)' }}>
-          <div style={{ maxWidth: 680, display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--orange)' }}>
-              {editing ? 'Modifier le projet' : 'Nouveau projet'}
-            </p>
-
-            {/* Photo */}
-            <div className="form-field">
-              <label className="form-label">Photo du chantier</label>
-              {preview ? (
-                <div style={{ position: 'relative', marginBottom: 8 }}>
-  <div style={{
-    width: '100%',
-    aspectRatio: '1 / 1',
-    background: '#1E293B',
-    borderRadius: 10,
-    overflow: 'hidden',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }}>
-    <img src={preview} alt="Aperçu"
-      style={{
-        maxWidth: '100%',
-        maxHeight: '100%',
-        objectFit: 'contain',
-        display: 'block',
-      }} />
-  </div>
-  <button
-    onClick={() => { setPreview(null); set('photoData', null) }}
-    style={{
-      position: 'absolute', top: 8, right: 8,
-      background: 'rgba(0,0,0,0.55)', color: 'white',
-      border: 'none', borderRadius: '50%', width: 28, height: 28,
-      cursor: 'pointer', fontSize: 16, lineHeight: '28px', textAlign: 'center',
-    }}>×</button>
-</div>
-              ) : (
-                <label style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  gap: 10, height: 100, border: '2px dashed var(--border)',
-                  borderRadius: 10, cursor: 'pointer', color: 'var(--muted)',
-                  fontSize: 13, background: 'var(--concrete-bg)',
-                }}>
-                  📷 Ajouter une photo
-                  <input type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }} />
-                </label>
-              )}
-            </div>
-
-            {/* Nom + Client */}
-            <div className="form-grid-2">
-              <div className="form-field">
-                <label className="form-label">Nom du projet <span className="form-required">*</span></label>
-                <input placeholder="Unité de distillation DA-201" value={form.name}
-                  onChange={e => set('name', e.target.value)} autoFocus />
-              </div>
-              <div className="form-field">
-                <label className="form-label">Client / Maître d'ouvrage</label>
-                <input placeholder="TotalEnergies, BASF..." value={form.client}
-                  onChange={e => set('client', e.target.value)} />
-              </div>
-            </div>
-
-            {/* Adresse + Type */}
-            <div className="form-grid-2">
-              <div className="form-field">
-                <label className="form-label">Adresse du chantier</label>
-                <input placeholder="ZI de Grandpuits, 77720 Mormant" value={form.address}
-                  onChange={e => set('address', e.target.value)} />
-              </div>
-              <div className="form-field">
-                <label className="form-label">Type de construction</label>
-                <select value={form.constructionType}
-                  onChange={e => set('constructionType', e.target.value)}>
-                  <option value="">— Sélectionner —</option>
-                  {CONSTRUCTION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-            </div>
-
-            {/* Description */}
-            <div className="form-field">
-              <label className="form-label">Description</label>
-              <textarea placeholder="Contexte du projet, périmètre d'intervention..."
-                value={form.description} onChange={e => set('description', e.target.value)}
-                style={{ minHeight: 80 }} />
-            </div>
-
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button className="btn btn-primary btn-sm" onClick={save} disabled={!form.name.trim() || loading}>
-                {loading ? 'Enregistrement...' : (editing ? 'Enregistrer' : 'Créer le projet')}
-              </button>
-              <button className="btn btn-outline btn-sm" onClick={cancel}>Annuler</button>
-            </div>
-          </div>
+      {/* Topbar sombre */}
+      <div className="topbar topbar-dark">
+        <BrandLogo />
+        <div className="topbar-divider" />
+        <div className="topbar-title">
+          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13 }}>Projets</p>
         </div>
-      )}
+        <button className="btn btn-primary btn-sm" onClick={openCreate}>+ Nouveau projet</button>
+      </div>
 
-      {/* Liste */}
-      <div className="scroll">
-        <div className="page-content">
-          {projects.length === 0 && !showForm && (
-            <div className="empty-state">
-              <p className="empty-state-title">Aucun projet</p>
-              <p className="empty-state-sub">Crée ton premier projet pour démarrer.</p>
-              <button className="btn btn-primary btn-sm" style={{ marginTop: 16 }} onClick={openCreate}>
-                + Créer un projet
-              </button>
+      {/* Split avec sidebar */}
+      <div className="split split-dark">
+
+        {/* Sidebar */}
+        <div className="icon-sidebar">
+          <svg width="22" height="26" viewBox="0 0 32 38" fill="none" style={{ marginBottom: 10 }} aria-hidden="true">
+            <path d="M16 2C8 2 4 9 4 14C4 22 10 29 16 36C22 29 28 22 28 14C28 9 24 2 16 2Z" fill="#EA580C"/>
+            <circle cx="16" cy="13" r="5.5" stroke="white" strokeWidth="2" fill="none"/>
+            <circle cx="16" cy="13" r="2" fill="white"/>
+          </svg>
+          <div className="icon-sidebar-divider"/>
+          <button className="icon-sidebar-item active">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span className="icon-sidebar-label">Projets</span>
+          </button>
+        </div>
+
+        {/* Contenu */}
+        <div className="content content-rounded">
+          {showForm && (
+            <div className="form-panel" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 64px)' }}>
+              <div style={{ maxWidth: 680, display: 'flex', flexDirection: 'column', gap: 14 }}>
+
+                <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--orange)' }}>
+                  {editing ? 'Modifier le projet' : 'Nouveau projet'}
+                </p>
+
+                {/* Photo */}
+                <div className="form-field">
+                  <label className="form-label">Photo du chantier</label>
+                  {preview ? (
+                    <div style={{ position: 'relative', marginBottom: 8 }}>
+                      <div style={{ width: '100%', aspectRatio: '1/1', background: '#1E293B', borderRadius: 10, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <img src={preview} alt="Aperçu" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}/>
+                      </div>
+                      <button onClick={() => { setPreview(null); set('photoData', null) }}
+                        style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.55)', color: 'white', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 16, lineHeight: '28px', textAlign: 'center' }}>×</button>
+                    </div>
+                  ) : (
+                    <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, height: 100, border: '2px dashed var(--border)', borderRadius: 10, cursor: 'pointer', color: 'var(--muted)', fontSize: 13, background: 'var(--concrete-bg)' }}>
+                      📷 Ajouter une photo
+                      <input type="file" accept="image/*" onChange={handlePhoto} style={{ display: 'none' }}/>
+                    </label>
+                  )}
+                </div>
+
+                <div className="form-grid-2">
+                  <div className="form-field">
+                    <label className="form-label">Nom du projet <span className="form-required">*</span></label>
+                    <input placeholder="Unité de distillation DA-201" value={form.name} onChange={e => set('name', e.target.value)} autoFocus/>
+                  </div>
+                  <div className="form-field">
+                    <label className="form-label">Client / Maître d'ouvrage</label>
+                    <input placeholder="TotalEnergies, BASF..." value={form.client} onChange={e => set('client', e.target.value)}/>
+                  </div>
+                </div>
+
+                <div className="form-grid-2">
+                  <div className="form-field">
+                    <label className="form-label">Adresse du chantier</label>
+                    <input placeholder="ZI de Grandpuits, 77720 Mormant" value={form.address} onChange={e => set('address', e.target.value)}/>
+                  </div>
+                  <div className="form-field">
+                    <label className="form-label">Type de construction</label>
+                    <select value={form.constructionType} onChange={e => set('constructionType', e.target.value)}>
+                      <option value="">— Sélectionner —</option>
+                      {CONSTRUCTION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="form-label">Description</label>
+                  <textarea placeholder="Contexte du projet, périmètre d'intervention..." value={form.description} onChange={e => set('description', e.target.value)} style={{ minHeight: 80 }}/>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn btn-primary btn-sm" onClick={save} disabled={!form.name.trim() || loading}>
+                    {loading ? 'Enregistrement...' : (editing ? 'Enregistrer' : 'Créer le projet')}
+                  </button>
+                  <button className="btn btn-outline btn-sm" onClick={cancel}>Annuler</button>
+                </div>
+              </div>
             </div>
           )}
 
-          {projects.map(p => (
-  <div key={p.id}
-    style={{ background: 'white', border: '0.5px solid var(--border)', borderRadius: 12, marginBottom: 10, overflow: 'hidden', cursor: 'pointer' }}
-    onClick={() => onSelect(p)}>
+          {/* Liste projets */}
+          <div className="scroll">
+            <div className="page-content">
+              {projects.length === 0 && !showForm && (
+                <div className="empty-state">
+                  <p className="empty-state-title">Aucun projet</p>
+                  <p className="empty-state-sub">Crée ton premier projet pour démarrer.</p>
+                  <button className="btn btn-primary btn-sm" style={{ marginTop: 16 }} onClick={openCreate}>
+                    + Créer un projet
+                  </button>
+                </div>
+              )}
 
-    {/* Barre accent fine */}
-    <div style={{ height: 3, background: p.photoData ? 'linear-gradient(90deg,#09354C,#EA580C)' : 'linear-gradient(90deg,#09354C,#EA580C)' }} />
-
-    <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px' }}>
-
-      {/* Photo miniature ou initiales */}
-      <div style={{
-        width: 52, height: 52, borderRadius: 10, flexShrink: 0, overflow: 'hidden',
-        background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        {p.photoData
-          ? <img src={p.photoData} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <span style={{ fontSize: 18, fontWeight: 700, color: 'var(--blue)' }}>
-              {p.name.slice(0,2).toUpperCase()}
-            </span>
-        }
-      </div>
-
-      {/* Infos */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {p.name}
-        </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 10px', fontSize: 12, color: 'var(--muted)' }}>
-          {p.client          && <span>👤 {p.client}</span>}
-          {p.constructionType && <span>🏭 {p.constructionType}</span>}
-          {p.address          && <span>📍 {p.address}</span>}
-        </div>
-      </div>
-
-      {/* Actions */}
-      {confirmDeleteId === p.id ? (
-  <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}
-    onClick={e => e.stopPropagation()}>
-    <span style={{ fontSize: 11, color: 'var(--muted)', whiteSpace: 'nowrap' }}>Supprimer ?</span>
-    <button className="btn btn-xs btn-danger"
-      onClick={() => deleteProject(p.id)}>Oui</button>
-    <button className="btn btn-xs btn-outline"
-      onClick={() => setConfirmDeleteId(null)}>Non</button>
-  </div>
-) : (
-  <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 5, flexShrink: 0, alignItems: 'center' }}>
-    <button className="btn btn-xs btn-outline"
-      onClick={() => openEdit(p)}>✏️</button>
-    <button className="btn btn-xs btn-danger"
-      onClick={() => setConfirmDeleteId(p.id)}>🗑</button>
-    <span style={{ color: 'var(--border)', fontSize: 18, marginLeft: 4 }}>›</span>
-  </div>
-)}
-
-    </div>
-  </div>
-))}
+              {projects.map(p => (
+                <div key={p.id}
+                  style={{ background: 'white', border: '0.5px solid var(--border)', borderRadius: 12, marginBottom: 10, overflow: 'hidden', cursor: 'pointer' }}
+                  onClick={() => onSelect(p)}>
+                  <div style={{ height: 3, background: 'linear-gradient(90deg,#09354C,#EA580C)' }}/>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '12px 14px' }}>
+                    <div style={{ width: 52, height: 52, borderRadius: 10, flexShrink: 0, overflow: 'hidden', background: '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {p.photoData
+                        ? <img src={p.photoData} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                        : <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--blue)' }}>{p.name.slice(0,2).toUpperCase()}</span>
+                      }
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 10px', fontSize: 12, color: 'var(--muted)' }}>
+                        {p.client           && <span>👤 {p.client}</span>}
+                        {p.constructionType && <span>🏭 {p.constructionType}</span>}
+                        {p.address          && <span>📍 {p.address}</span>}
+                      </div>
+                    </div>
+                    {confirmDeleteId === p.id ? (
+                      <div style={{ display: 'flex', gap: 5, alignItems: 'center' }} onClick={e => e.stopPropagation()}>
+                        <span style={{ fontSize: 11, color: 'var(--muted)', whiteSpace: 'nowrap' }}>Supprimer ?</span>
+                        <button className="btn btn-xs btn-danger" onClick={() => deleteProject(p.id)}>Oui</button>
+                        <button className="btn btn-xs btn-outline" onClick={() => setConfirmDeleteId(null)}>Non</button>
+                      </div>
+                    ) : (
+                      <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 5, flexShrink: 0, alignItems: 'center' }}>
+                        <button className="btn btn-xs btn-outline" onClick={() => openEdit(p)}>✏️</button>
+                        <button className="btn btn-xs btn-danger" onClick={() => setConfirmDeleteId(p.id)}>🗑</button>
+                        <span style={{ color: 'var(--border)', fontSize: 18, marginLeft: 4 }}>›</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </>
-  )
+)
 }
