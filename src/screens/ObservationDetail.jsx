@@ -66,12 +66,7 @@ export default function ObservationDetail({ observation, lots, onBack, onEdit, o
     setCompressing(true)
     try {
       const compressed = await compressPhoto(file)
-      await Engine.createPhoto({
-        observationId: obs.id,
-        data: compressed,
-        name: file.name,
-        createdAt: new Date(),
-      })
+      await Engine.createPhoto(obs.id, compressed, file.name)
       loadData()
     } finally {
       setCompressing(false)
