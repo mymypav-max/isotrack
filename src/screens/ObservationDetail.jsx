@@ -61,18 +61,33 @@ export default function ObservationDetail({ observation, lots, onBack, onEdit, o
   }
 
   const addPhoto = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    setCompressing(true)
-    try {
-      const compressed = await compressPhoto(file)
-      await Engine.createPhoto(obs.id, compressed, file.name)
-      loadData()
-    } finally {
-      setCompressing(false)
-      e.target.value = ''
+  const file = e.target.files[0]
+  if (!file) return
+  setCompressing(true)
+  try {
+    console.log('1. Fichier sélectionné:', file.name, file.size, file.type)
+    
+    const compressed = await compressPhoto(file)
+    console.log('2. Compression OK:', compressed ? compressed.length + ' chars' : 'VIDE/NULL')
+    
+    if (!compressed || compressed.length < 100) {
+      throw new Error('Compression a retourné un résultat vide')
     }
+
+    await Engine.createPhoto(obs.id, compressed, file.name)
+    console.log('3. Photo sauvegardée en base')
+
+    await loadData()
+    console.log('4. Photos rechargées:', photos.length)
+
+  } catch(err) {
+    console.error('ERREUR addPhoto:', err)
+    alert(`Erreur photo: ${err.message}`)
+  } finally {
+    setCompressing(false)
+    e.target.value = ''
   }
+}
 
   const deletePhoto = async (id) => {
     await Engine.deletePhoto(id)
