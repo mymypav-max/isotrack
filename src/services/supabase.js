@@ -77,7 +77,7 @@ export const sb = {
       return (data || []).map(toLocal.project)
     },
     upsert: async (p) => {
-  await supabase.from('projects').upsert({
+  const { error } = await supabase.from('projects').upsert({
     id: p.id, name: p.name, client: p.client || '',
     address:           p.address           || null,
     construction_type: p.constructionType  || null,
@@ -85,6 +85,10 @@ export const sb = {
     description: p.description || '', next_obs_number: p.nextObsNumber || 1,
     created_at: p.createdAt, updated_at: now(),
   })
+  if (error) {
+    console.error('Supabase projects upsert error:', error)
+    throw error
+  }
 },
     delete: async (id) => {
       await supabase.from('projects').delete().eq('id', id)
