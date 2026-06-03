@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Engine } from '../services/syncEngine'
 import { compressPhoto } from '../services/photoService'
+import { CropModal } from '../components/CropModal'
 
 const CONSTRUCTION_TYPES = [
   'Pétrochimie / Raffinage', 'Industrie chimique',
@@ -21,6 +22,8 @@ export default function ProjectsList({ onSelect }) {
   const [form,      setForm]      = useState(EMPTY)
   const [preview,   setPreview]   = useState(null)
   const [loading,   setLoading]   = useState(false)
+  const [cropSrc,     setCropSrc]     = useState(null)
+  const [pendingPhoto, setPendingPhoto] = useState(null)
 
   useEffect(() => { load() }, [])
 
@@ -45,13 +48,28 @@ export default function ProjectsList({ onSelect }) {
   const cancel = () => { setShowForm(false); setEditing(null); setForm(EMPTY); setPreview(null) }
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-  const handlePhoto = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    const compressed = await compressPhoto(file, { maxWidth: 1200, quality: 0.78 })
-    setPreview(compressed)
-    set('photoData', compressed)
-  }
+  const handlePhoto = (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  e.target.value = ''
+  const url = URL.createObjectURL(file)
+  setPendingPhoto(file)
+  setCropSrc(url)
+}
+
+const handleCropApply = (croppedBase64) => {
+  URL.revokeObjectURL(cropSrc)
+  setCropSrc(null)
+  setPendingPhoto(null)
+  setPreview(croppedBase64)
+  set('photoData', croppedBase64)
+}
+
+const handleCropCancel = () => {
+  URL.revokeObjectURL(cropSrc)
+  setCropSrc(null)
+  setPendingPhoto(null)
+}
 
   const save = async () => {
     if (!form.name.trim()) return
@@ -72,6 +90,14 @@ export default function ProjectsList({ onSelect }) {
   }
 
   return (
+  <>
+    {cropSrc && (
+      <CropModal
+        src={cropSrc}
+        onApply={handleCropApply}
+        onCancel={handleCropCancel}
+      />
+    )}
     <div className="app">
       {/* TopBar */}
       <div className="topbar">
@@ -239,5 +265,6 @@ export default function ProjectsList({ onSelect }) {
         </div>
       </div>
     </div>
+  </>
   )
 }
