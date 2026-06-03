@@ -30,7 +30,7 @@ export const local = {
     },
     put: (data) => db.projects.put(data),
     markSynced: (id) => db.projects.update(id, { syncedAt: now() }),
-    getUnsynced: () => db.projects.where('syncedAt').equals(null).toArray(),
+    getUnsynced: () => db.projects.filter(p => !p.syncedAt).toArray(),
   },
 
   lots: {
@@ -45,7 +45,7 @@ export const local = {
     delete: (id) => db.lots.delete(id),
     put: (data) => db.lots.put(data),
     markSynced: (id) => db.lots.update(id, { syncedAt: now() }),
-    getUnsynced: () => db.lots.where('syncedAt').equals(null).toArray(),
+    getUnsynced: () => db.lots.filter(l => !l.syncedAt).toArray(),
   },
 
   visits: {
@@ -59,7 +59,7 @@ export const local = {
     delete: (id) => db.siteVisits.delete(id),
     put: (data) => db.siteVisits.put(data),
     markSynced: (id) => db.siteVisits.update(id, { syncedAt: now() }),
-    getUnsynced: () => db.siteVisits.where('syncedAt').equals(null).toArray(),
+    getUnsynced: () => db.siteVisits.filter(v => !v.syncedAt).toArray(),
   },
 
   observations: {
@@ -79,7 +79,7 @@ export const local = {
     },
     put: (data) => db.observations.put(data),
     markSynced: (id) => db.observations.update(id, { syncedAt: now() }),
-    getUnsynced: () => db.observations.where('syncedAt').equals(null).toArray(),
+    getUnsynced: () => db.observations.filter(o => !o.syncedAt).toArray(),
   },
 
   documents: {
@@ -97,7 +97,7 @@ export const local = {
     },
     put: (data) => db.documents.put(data),
     markSynced: (id) => db.documents.update(id, { syncedAt: now() }),
-    getUnsynced: () => db.documents.where('syncedAt').equals(null).toArray(),
+    getUnsynced: () => db.documents.filter(d => !d.syncedAt).toArray(),
   },
 
   pins: {
@@ -111,7 +111,7 @@ export const local = {
     delete: (id) => db.pins.delete(id),
     put: (data) => db.pins.put(data),
     markSynced: (id) => db.pins.update(id, { syncedAt: now() }),
-    getUnsynced: () => db.pins.where('syncedAt').equals(null).toArray(),
+    getUnsynced: () => db.pins.filter(p => !p.syncedAt).toArray(),
   },
 
   photos: {
@@ -127,7 +127,7 @@ export const local = {
     deleteByObservation: (obsId) => db.photos.where('observationId').equals(obsId).delete(),
     put: (data) => db.photos.put(data),
     markSynced: (id) => db.photos.update(id, { syncedAt: now() }),
-    getUnsynced: () => db.photos.where('syncedAt').equals(null).toArray(),
+    getUnsynced: () => db.photos.filter(p => !p.syncedAt).toArray(),
   },
 
   comments: {
@@ -141,7 +141,7 @@ export const local = {
     deleteByObservation: (obsId) => db.comments.where('observationId').equals(obsId).delete(),
     put: (data) => db.comments.put(data),
     markSynced: (id) => db.comments.update(id, { syncedAt: now() }),
-    getUnsynced: () => db.comments.where('syncedAt').equals(null).toArray(),
+    getUnsynced: () => db.comments.filter(c => !c.syncedAt).toArray(),
   },
 
   contacts: {
@@ -155,7 +155,7 @@ export const local = {
     delete: (id) => db.contacts.delete(id),
     put: (data) => db.contacts.put(data),
     markSynced: (id) => db.contacts.update(id, { syncedAt: now() }),
-    getUnsynced: () => db.contacts.where('syncedAt').equals(null).toArray(),
+    getUnsynced: () => db.contacts.filter(c => !c.syncedAt).toArray(),
   },
 }
 
