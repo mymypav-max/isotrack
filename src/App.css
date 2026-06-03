@@ -182,3 +182,33 @@ textarea { resize: vertical; min-height: 80px; }
   .page-content { padding: 14px; }
   .topbar { padding: 0 14px; }
 }
+/* ── Topbar sombre (ProjectDetail) ── */
+.topbar-dark { background: var(--blue); border-bottom: none; }
+.topbar-dark h1 { color: white; }
+.topbar-dark p  { color: rgba(255,255,255,0.5); }
+.topbar-dark .topbar-back { color: rgba(255,255,255,0.75); }
+.topbar-dark .topbar-back:hover { background: rgba(255,255,255,0.08); }
+.topbar-dark .topbar-divider { background: rgba(255,255,255,0.2); }
+.topbar-dark .btn-ghost { color: rgba(255,255,255,0.8); border-color: rgba(255,255,255,0.2); }
+
+/* ── Sidebar avec labels ── */
+.icon-sidebar { width: 72px; }
+.icon-sidebar-item {
+  width: 60px; height: 52px;
+  flex-direction: column; gap: 4px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #4E8BA8; border: none;
+  background: none; transition: background 0.12s, color 0.12s;
+}
+.icon-sidebar-item:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.7); }
+.icon-sidebar-item.active { background: rgba(255,255,255,0.14); color: white; }
+.icon-sidebar-label {
+  font-size: 9px; font-weight: 600;
+  color: inherit; text-align: center; line-height: 1;
+  font-family: var(--font);
+}
+
+/* ── Arrondi Archipad style ── */
+.split-dark { background: var(--blue); }
+.content-rounded { border-top-left-radius: 20px; overflow: hidden; }

@@ -8,7 +8,8 @@ import ObservationDetail from './ObservationDetail'
 import PdfViewer from './PdfViewer'
 import { generateReport } from '../services/exportService'
 import { VisitSelectModal } from "../components/VisitSelectModal"
-import { LayoutDashboard, Layers, CalendarCheck, FileText, ClipboardList, Users } from 'lucide-react'
+import { LayoutDashboard, Layers, CalendarCheck, FileText, ClipboardList, Users, Building2 } from 'lucide-react'
+import { CropModal } from '../components/CropModal'
 
 const LOT_LABEL = Object.fromEntries(LOT_COLORS.map(c => [c.value, c.label]))
 
@@ -25,7 +26,7 @@ export function Pill({ config, small }) {
 // ── TopBar ────────────────────────────────────────────────────
 function TopBar({ title, subtitle, onBack, right }) {
   return (
-    <div className="topbar">
+    <div className="topbar topbar-dark">
       {onBack && <>
         <button className="topbar-back" onClick={onBack}>← Projets</button>
         <div className="topbar-divider" />
@@ -42,29 +43,28 @@ function TopBar({ title, subtitle, onBack, right }) {
 // ── Sidebar ───────────────────────────────────────────────────
 function Sidebar({ tab, onChange }) {
   const items = [
-    { key: 'dashboard',    Icon: LayoutDashboard, label: 'Tableau de bord' },
-    { key: 'lots',         Icon: Layers,           label: 'Lots de travaux' },
-    { key: 'visits',       Icon: CalendarCheck,    label: 'Visites'         },
-    { key: 'documents',    Icon: FileText,         label: 'Documents'       },
-    { key: 'observations', Icon: ClipboardList,    label: 'Observations'    },
-    { key: 'contacts',     Icon: Users,            label: 'Contacts'        },
+    { key: 'info',         Icon: Building2,      label: 'Projet'  },
+    { key: 'dashboard',    Icon: LayoutDashboard, label: 'Tableau' },
+    { key: 'lots',         Icon: Layers,          label: 'Lots'    },
+    { key: 'visits',       Icon: CalendarCheck,   label: 'Visites' },
+    { key: 'documents',    Icon: FileText,        label: 'Docs'    },
+    { key: 'observations', Icon: ClipboardList,   label: 'Obs.'    },
+    { key: 'contacts',     Icon: Users,           label: 'Contacts'},
   ]
   return (
     <div className="icon-sidebar">
-      {/* Logo pin */}
-      <svg width="28" height="34" viewBox="0 0 32 38" fill="none" style={{ marginBottom: 10 }} aria-hidden="true">
+      <svg width="22" height="26" viewBox="0 0 32 38" fill="none" style={{ marginBottom: 10 }} aria-hidden="true">
         <path d="M16 2C8 2 4 9 4 14C4 22 10 29 16 36C22 29 28 22 28 14C28 9 24 2 16 2Z" fill="#EA580C"/>
         <circle cx="16" cy="13" r="5.5" stroke="white" strokeWidth="2" fill="none"/>
         <circle cx="16" cy="13" r="2" fill="white"/>
       </svg>
-      <div className="icon-sidebar-divider" />
+      <div className="icon-sidebar-divider"/>
       {items.map(({ key, Icon, label }) => (
         <button key={key}
           className={`icon-sidebar-item ${tab === key ? 'active' : ''}`}
-          onClick={() => onChange(key)}
-          title={label}>
-          <Icon size={20} strokeWidth={1.8} />
-          <span className="tooltip">{label}</span>
+          onClick={() => onChange(key)}>
+          <Icon size={18} strokeWidth={1.8}/>
+          <span className="icon-sidebar-label">{label}</span>
         </button>
       ))}
     </div>
@@ -527,10 +527,150 @@ function ContactsTab({ project, contacts, onReload }) {
     </div>
   )
 }
+const CONSTRUCTION_TYPES = [
+  'Pétrochimie / Raffinage','Industrie chimique','Industrie pharmaceutique',
+  'Agroalimentaire','Énergie / Nucléaire','Offshore','Infrastructure',
+  'Bâtiment industriel','Naval','Autre',
+]
+
+function ProjectInfoTab({ project, onUpdate }) {
+  const [editing,   setEditing]   = useState(false)
+  const [loading,   setLoading]   = useState(false)
+  const [cropSrc,   setCropSrc]   = useState(null)
+  const [pendingPhoto, setPendingPhoto] = useState(null)
+  const [form, setForm] = useState({
+    name: project.name || '', client: project.client || '',
+    address: project.address || '', constructionType: project.constructionType || '',
+    description: project.description || '', photoData: project.photoData || null,
+  })
+  const [preview, setPreview] = useState(project.photoData || null)
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  const handlePhoto = (e) => {
+    const file = e.target.files[0]; if (!file) return; e.target.value = ''
+    setCropSrc(URL.createObjectURL(file)); setPendingPhoto(file)
+  }
+  const handleCropApply = (b64) => {
+    URL.revokeObjectURL(cropSrc); setCropSrc(null); setPendingPhoto(null)
+    setPreview(b64); set('photoData', b64)
+  }
+  const handleCropCancel = () => {
+    URL.revokeObjectURL(cropSrc); setCropSrc(null); setPendingPhoto(null)
+  }
+
+  const save = async () => {
+    setLoading(true)
+    try { await Engine.updateProject(project.id, form); onUpdate({ ...project, ...form }); setEditing(false) }
+    finally { setLoading(false) }
+  }
+  const cancel = () => {
+    setForm({ name:project.name||'', client:project.client||'', address:project.address||'',
+              constructionType:project.constructionType||'', description:project.description||'',
+              photoData:project.photoData||null })
+    setPreview(project.photoData||null); setEditing(false)
+  }
+
+  return (
+    <div className="scroll">
+      {cropSrc && <CropModal src={cropSrc} onApply={handleCropApply} onCancel={handleCropCancel}/>}
+
+      {editing ? (
+        <div className="page-content" style={{ maxWidth: 680 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            <div className="form-field">
+              <label className="form-label">Photo du chantier</label>
+              {preview ? (
+                <div style={{ position:'relative' }}>
+                  <div style={{ width:'100%', aspectRatio:'16/7', background:'#1E293B', borderRadius:10, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                    <img src={preview} alt="" style={{ maxWidth:'100%', maxHeight:'100%', objectFit:'contain' }}/>
+                  </div>
+                  <button onClick={() => { setPreview(null); set('photoData',null) }}
+                    style={{ position:'absolute', top:8, right:8, background:'rgba(0,0,0,.55)', color:'white', border:'none', borderRadius:'50%', width:28, height:28, cursor:'pointer', fontSize:16 }}>×</button>
+                </div>
+              ) : (
+                <label style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, height:100, border:'2px dashed var(--border)', borderRadius:10, cursor:'pointer', color:'var(--muted)', fontSize:13, background:'var(--concrete-bg)' }}>
+                  📷 Ajouter une photo
+                  <input type="file" accept="image/*" onChange={handlePhoto} style={{ display:'none' }}/>
+                </label>
+              )}
+            </div>
+            <div className="form-grid-2">
+              <div className="form-field">
+                <label className="form-label">Nom <span className="form-required">*</span></label>
+                <input value={form.name} onChange={e => set('name',e.target.value)} autoFocus/>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Client / MOA</label>
+                <input value={form.client} onChange={e => set('client',e.target.value)}/>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Adresse</label>
+                <input value={form.address} onChange={e => set('address',e.target.value)}/>
+              </div>
+              <div className="form-field">
+                <label className="form-label">Type de construction</label>
+                <select value={form.constructionType} onChange={e => set('constructionType',e.target.value)}>
+                  <option value="">— Sélectionner —</option>
+                  {CONSTRUCTION_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="form-field">
+              <label className="form-label">Description</label>
+              <textarea value={form.description} onChange={e => set('description',e.target.value)} style={{ minHeight:80 }}/>
+            </div>
+            <div style={{ display:'flex', gap:8 }}>
+              <button className="btn btn-primary btn-sm" onClick={save} disabled={!form.name.trim()||loading}>
+                {loading ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+              <button className="btn btn-outline btn-sm" onClick={cancel}>Annuler</button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="page-content" style={{ maxWidth:700 }}>
+          {project.photoData && (
+            <div style={{ width:'100%', borderRadius:14, overflow:'hidden', marginBottom:20, background:'#1E293B', aspectRatio:'16/7' }}>
+              <img src={project.photoData} alt={project.name} style={{ width:'100%', height:'100%', objectFit:'cover' }}/>
+            </div>
+          )}
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:18 }}>
+            <div>
+              <h2 style={{ fontSize:20, fontWeight:800 }}>{project.name}</h2>
+              {project.client && <p style={{ fontSize:14, color:'var(--muted)', marginTop:3 }}>👤 {project.client}</p>}
+            </div>
+            <button className="btn btn-outline btn-sm" onClick={() => setEditing(true)}>✏️ Modifier</button>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:14 }}>
+            {project.address && (
+              <div className="card" style={{ padding:'12px 14px' }}>
+                <div style={{ fontSize:10, fontWeight:600, color:'var(--subtle)', textTransform:'uppercase', letterSpacing:.5, marginBottom:4 }}>Adresse</div>
+                <div style={{ fontSize:14, fontWeight:500 }}>📍 {project.address}</div>
+              </div>
+            )}
+            {project.constructionType && (
+              <div className="card" style={{ padding:'12px 14px' }}>
+                <div style={{ fontSize:10, fontWeight:600, color:'var(--subtle)', textTransform:'uppercase', letterSpacing:.5, marginBottom:4 }}>Type</div>
+                <div style={{ fontSize:14, fontWeight:500 }}>🏭 {project.constructionType}</div>
+              </div>
+            )}
+          </div>
+          {project.description && (
+            <div className="card">
+              <div style={{ fontSize:10, fontWeight:600, color:'var(--subtle)', textTransform:'uppercase', letterSpacing:.5, marginBottom:8 }}>Description</div>
+              <p style={{ fontSize:14, lineHeight:1.7, color:'var(--stone-dark)' }}>{project.description}</p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ── Écran principal ───────────────────────────────────────────
-export default function ProjectDetail({ project, onBack }) {
-  const [tab,          setTab]          = useState('dashboard')
+export default function ProjectDetail({ project, onBack, onProjectUpdate }) {
+  const [tab,          setTab]          = useState('info')
   const [observations, setObservations] = useState([])
   const [visits,       setVisits]       = useState([])
   const [documents,    setDocuments]    = useState([])
@@ -546,7 +686,12 @@ export default function ProjectDetail({ project, onBack }) {
   const [exporting, setExporting] = useState(false)
   const [exportProgress, setExportProgress] = useState('')
   const [showVisitSelect, setShowVisitSelect] = useState(false)
-
+  const [currentProject, setCurrentProject] = useState(project)
+  
+  const handleProjectUpdate = (updated) => {
+    setCurrentProject(updated)
+    onProjectUpdate?.(updated)
+  }
   useEffect(() => { loadAll() }, [project])
 
   const loadAll = async () => {
@@ -646,6 +791,12 @@ const handleExport = async (selectedVisit) => {
       />
     )
   }
+  {tab === 'info' && (
+  <ProjectInfoTab
+    project={currentProject}
+    onUpdate={handleProjectUpdate}
+  />
+)}
 
   return (
     <div className="app">
@@ -678,9 +829,9 @@ const handleExport = async (selectedVisit) => {
         </div>
       )}
 
-      <div className="split">
+      <div className="split split-dark">
         <Sidebar tab={tab} onChange={setTab} />
-        <div className="content">
+        <div className="content content-rounded">
           {tab === 'dashboard'    && <DashboardTab stats={stats} observations={observations} onNav={setTab} />}
           {tab === 'lots'         && <LotsTab project={project} lots={lots} observations={observations} onReload={loadAll} />}
           {tab === 'visits'       && <VisitsTab project={project} visits={visits} onReload={loadAll} />}
