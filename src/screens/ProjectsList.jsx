@@ -81,7 +81,7 @@ export default function ProjectsList({ onSelect }) {
 
       {/* Formulaire */}
       {showForm && (
-        <div className="form-panel">
+  <div className="form-panel" style={{ overflowY: 'auto', maxHeight: 'calc(100vh - 64px)' }}>
           <div style={{ maxWidth: 680, display: 'flex', flexDirection: 'column', gap: 14 }}>
 
             <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--orange)' }}>
