@@ -112,9 +112,12 @@ export const Engine = {
 
   // Projects
   getProjects: async () => {
-    await pullProjects()
-    return local.projects.getAll()
-  },
+  if (isOnline()) {
+    await push()        // D'abord envoyer les données locales non sync
+    await pullProjects() // Puis récupérer tout depuis Supabase
+  }
+  return local.projects.getAll()
+},
   createProject: async (data) => {
     const id = await local.projects.add(data)
     if (isOnline()) {
