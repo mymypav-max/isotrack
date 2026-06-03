@@ -3,28 +3,7 @@ import { Engine } from '../services/syncEngine'
 import { STATUS, CRITICALITY, STATUS_TRANSITIONS } from '../constants'
 import { Pill } from './ProjectDetail'
 import { ActionMenu } from '../components/ActionMenu'
-import { db } from '../db/database'
-
-async function compressImage(file) {
-  return new Promise((resolve) => {
-    const img = new Image()
-    const url = URL.createObjectURL(file)
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      const maxDim = 1200
-      let w = img.width, h = img.height
-      if (w > maxDim || h > maxDim) {
-        if (w > h) { h = Math.round((h / w) * maxDim); w = maxDim }
-        else       { w = Math.round((w / h) * maxDim); h = maxDim }
-      }
-      canvas.width = w; canvas.height = h
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
-      resolve(canvas.toDataURL('image/jpeg', 0.78))
-      URL.revokeObjectURL(url)
-    }
-    img.src = url
-  })
-}
+import { compressPhoto } from '../services/photoService'
 
 export default function ObservationDetail({ observation, lots, onBack, onEdit, onDeleted, onReload }) {
   const [obs, setObs]           = useState(observation)
@@ -86,7 +65,7 @@ export default function ObservationDetail({ observation, lots, onBack, onEdit, o
     if (!file) return
     setCompressing(true)
     try {
-      const compressed = await compressImage(file)
+      const compressed = await compressPhoto(file)
       await Engine.createPhoto({
         observationId: obs.id,
         data: compressed,
