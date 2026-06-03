@@ -51,7 +51,7 @@ body {
 
 /* ── Brand ── */
 .brand { display: flex; align-items: center; gap: 9px; }
-.brand-text { font-size: 17px; font-weight: 800; color: var(--blue); line-height: 1; }
+.brand-text { font-size: 22px; font-weight: 800; color: var(--blue); line-height: 1; }
 .brand-text em { color: var(--orange); font-style: normal; }
 
 /* ── Split layout ── */

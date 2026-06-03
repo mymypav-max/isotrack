@@ -40,6 +40,7 @@ export default function ProjectsList({ onSelect }) {
   const [loading,   setLoading]   = useState(false)
   const [cropSrc,     setCropSrc]     = useState(null)
   const [pendingPhoto, setPendingPhoto] = useState(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
   useEffect(() => { load() }, [])
 
@@ -102,8 +103,10 @@ const handleCropCancel = () => {
   }
 
   const deleteProject = async (id) => {
-    await Engine.deleteProject(id); load()
-  }
+  await Engine.deleteProject(id)
+  setConfirmDeleteId(null)
+  load()
+}
 
   return (
   <>
@@ -277,11 +280,24 @@ const handleCropCancel = () => {
       </div>
 
       {/* Actions */}
-      <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 5, flexShrink: 0, alignItems: 'center' }}>
-        <button className="btn btn-xs btn-outline" onClick={() => openEdit(p)}>✏️</button>
-        <button className="btn btn-xs btn-danger" onClick={() => deleteProject(p.id)}>🗑</button>
-        <span style={{ color: 'var(--border)', fontSize: 18, marginLeft: 4 }}>›</span>
-      </div>
+      {confirmDeleteId === p.id ? (
+  <div style={{ display: 'flex', gap: 5, alignItems: 'center' }}
+    onClick={e => e.stopPropagation()}>
+    <span style={{ fontSize: 11, color: 'var(--muted)', whiteSpace: 'nowrap' }}>Supprimer ?</span>
+    <button className="btn btn-xs btn-danger"
+      onClick={() => deleteProject(p.id)}>Oui</button>
+    <button className="btn btn-xs btn-outline"
+      onClick={() => setConfirmDeleteId(null)}>Non</button>
+  </div>
+) : (
+  <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 5, flexShrink: 0, alignItems: 'center' }}>
+    <button className="btn btn-xs btn-outline"
+      onClick={() => openEdit(p)}>✏️</button>
+    <button className="btn btn-xs btn-danger"
+      onClick={() => setConfirmDeleteId(p.id)}>🗑</button>
+    <span style={{ color: 'var(--border)', fontSize: 18, marginLeft: 4 }}>›</span>
+  </div>
+)}
 
     </div>
   </div>
