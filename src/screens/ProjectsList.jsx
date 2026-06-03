@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Engine } from '../services/syncEngine'
 import { compressPhoto } from '../services/photoService'
 import { CropModal } from '../components/CropModal'
@@ -13,6 +13,22 @@ const CONSTRUCTION_TYPES = [
 const EMPTY = {
   name: '', client: '', address: '',
   constructionType: '', description: '', photoData: null,
+}
+function BrandLogo() {
+  return (
+    <div className="brand">
+      <svg width="32" height="38" viewBox="0 0 32 38" fill="none" aria-hidden="true">
+        <path d="M16 2C8 2 4 9 4 14C4 22 10 29 16 36C22 29 28 22 28 14C28 9 24 2 16 2Z" fill="#09354C"/>
+        <circle cx="16" cy="13" r="5.5" stroke="#EA580C" strokeWidth="2" fill="none"/>
+        <circle cx="16" cy="13" r="2" fill="#EA580C"/>
+        <line x1="16" y1="6" x2="16" y2="9" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="16" y1="17" x2="16" y2="20" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="9" y1="13" x2="12" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+        <line x1="20" y1="13" x2="23" y2="13" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+      </svg>
+      <span className="brand-text">Iso<em>Track</em></span>
+    </div>
+  )
 }
 
 export default function ProjectsList({ onSelect }) {
@@ -100,10 +116,14 @@ const handleCropCancel = () => {
     )}
     <div className="app">
       {/* TopBar */}
-      <div className="topbar">
-        <div className="topbar-title"><h1>IsoTrack</h1><p>Projets</p></div>
-        <button className="btn btn-primary btn-sm" onClick={openCreate}>+ Nouveau projet</button>
-      </div>
+<div className="topbar">
+  <BrandLogo />
+  <div className="topbar-divider" />
+  <div className="topbar-title">
+    <p style={{ color: 'var(--muted)', fontSize: 13 }}>Projets</p>
+  </div>
+  <button className="btn btn-primary btn-sm" onClick={openCreate}>+ Nouveau projet</button>
+</div>
 
       {/* Formulaire */}
       {showForm && (
@@ -222,46 +242,42 @@ const handleCropCancel = () => {
           )}
 
           {projects.map(p => (
-            <div key={p.id} className="card"
-              style={{ marginBottom: 12, padding: 0, overflow: 'hidden', cursor: 'pointer' }}
-              onClick={() => onSelect(p)}>
+  <div key={p.id}
+    style={{ background: 'white', border: '0.5px solid var(--border)', borderRadius: 12, marginBottom: 12, overflow: 'hidden', cursor: 'pointer' }}
+    onClick={() => onSelect(p)}>
 
-              {/* Photo ou bande de couleur */}
-              {p.photoData ? (
-                <img src={p.photoData} alt={p.name}
-                  style={{ width: '100%', height: 120, objectFit: 'cover', display: 'block' }} />
-              ) : (
-                <div style={{
-                  height: 6, background: 'var(--orange)',
-                  background: 'linear-gradient(90deg, #EA580C, #F97316)',
-                }} />
-              )}
+    {/* Barre accent couleur */}
+    {p.photoData ? (
+      <img src={p.photoData} alt={p.name}
+        style={{ width: '100%', height: 130, objectFit: 'cover', display: 'block' }} />
+    ) : (
+      <div style={{ height: 4, background: 'linear-gradient(90deg, #09354C, #EA580C)' }} />
+    )}
 
-              <div style={{ padding: '12px 16px 14px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 3 }}>{p.name}</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 10px', fontSize: 12, color: 'var(--muted)' }}>
-                      {p.client        && <span>👤 {p.client}</span>}
-                      {p.constructionType && <span>🏭 {p.constructionType}</span>}
-                      {p.address       && <span>📍 {p.address}</span>}
-                    </div>
-                  </div>
-                  <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                    <button className="btn btn-xs btn-outline" onClick={() => openEdit(p)}>✏️</button>
-                    <button className="btn btn-xs btn-danger" onClick={() => deleteProject(p.id)}>🗑</button>
-                  </div>
-                </div>
-                {p.description && (
-                  <p style={{ fontSize: 12, color: 'var(--subtle)', marginTop: 8, lineHeight: 1.5,
-                    overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical' }}>
-                    {p.description}
-                  </p>
-                )}
-              </div>
-            </div>
-          ))}
+    <div style={{ padding: '13px 16px 15px' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 700, marginBottom: 5 }}>{p.name}</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', fontSize: 12, color: 'var(--muted)' }}>
+            {p.client         && <span>👤 {p.client}</span>}
+            {p.constructionType && <span>🏭 {p.constructionType}</span>}
+            {p.address         && <span>📍 {p.address}</span>}
+          </div>
+        </div>
+        <div onClick={e => e.stopPropagation()} style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+          <button className="btn btn-xs btn-outline" onClick={() => openEdit(p)}>✏️</button>
+          <button className="btn btn-xs btn-danger" onClick={() => deleteProject(p.id)}>🗑</button>
+        </div>
+      </div>
+      {p.description && (
+        <p style={{ fontSize: 12, color: 'var(--subtle)', marginTop: 8, lineHeight: 1.5,
+          overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+          {p.description}
+        </p>
+      )}
+    </div>
+  </div>
+))}
         </div>
       </div>
     </div>

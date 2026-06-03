@@ -8,6 +8,7 @@ import ObservationDetail from './ObservationDetail'
 import PdfViewer from './PdfViewer'
 import { generateReport } from '../services/exportService'
 import { VisitSelectModal } from "../components/VisitSelectModal"
+import { LayoutDashboard, Layers, CalendarCheck, FileText, ClipboardList, Users } from 'lucide-react'
 
 const LOT_LABEL = Object.fromEntries(LOT_COLORS.map(c => [c.value, c.label]))
 
@@ -41,20 +42,29 @@ function TopBar({ title, subtitle, onBack, right }) {
 // ── Sidebar ───────────────────────────────────────────────────
 function Sidebar({ tab, onChange }) {
   const items = [
-    { key: 'dashboard',    label: 'Tableau de bord' },
-    { key: 'lots',         label: 'Lots de travaux' },
-    { key: 'visits',       label: 'Visites' },
-    { key: 'documents',    label: 'Documents' },
-    { key: 'observations', label: 'Observations' },
-    { key: 'contacts',     label: 'Contacts' },
+    { key: 'dashboard',    Icon: LayoutDashboard, label: 'Tableau de bord' },
+    { key: 'lots',         Icon: Layers,           label: 'Lots de travaux' },
+    { key: 'visits',       Icon: CalendarCheck,    label: 'Visites'         },
+    { key: 'documents',    Icon: FileText,         label: 'Documents'       },
+    { key: 'observations', Icon: ClipboardList,    label: 'Observations'    },
+    { key: 'contacts',     Icon: Users,            label: 'Contacts'        },
   ]
   return (
-    <div className="sidebar">
-      {items.map(item => (
-        <button key={item.key}
-          className={`sidebar-item ${tab === item.key ? 'active' : ''}`}
-          onClick={() => onChange(item.key)}>
-          {item.label}
+    <div className="icon-sidebar">
+      {/* Logo pin */}
+      <svg width="28" height="34" viewBox="0 0 32 38" fill="none" style={{ marginBottom: 10 }} aria-hidden="true">
+        <path d="M16 2C8 2 4 9 4 14C4 22 10 29 16 36C22 29 28 22 28 14C28 9 24 2 16 2Z" fill="#EA580C"/>
+        <circle cx="16" cy="13" r="5.5" stroke="white" strokeWidth="2" fill="none"/>
+        <circle cx="16" cy="13" r="2" fill="white"/>
+      </svg>
+      <div className="icon-sidebar-divider" />
+      {items.map(({ key, Icon, label }) => (
+        <button key={key}
+          className={`icon-sidebar-item ${tab === key ? 'active' : ''}`}
+          onClick={() => onChange(key)}
+          title={label}>
+          <Icon size={20} strokeWidth={1.8} />
+          <span className="tooltip">{label}</span>
         </button>
       ))}
     </div>
