@@ -4,6 +4,7 @@ import { STATUS, CRITICALITY, STATUS_TRANSITIONS } from '../constants'
 import { Pill } from './ProjectDetail'
 import { ActionMenu } from '../components/ActionMenu'
 import { compressPhoto } from '../services/photoService'
+import { CropModal } from '../components/CropModal'
 
 export default function ObservationDetail({ observation, lots, onBack, onEdit, onDeleted, onReload }) {
   const [obs, setObs]           = useState(observation)
@@ -12,6 +13,8 @@ export default function ObservationDetail({ observation, lots, onBack, onEdit, o
   const [newComment, setNewComment] = useState('')
   const [fullPhoto, setFullPhoto]   = useState(null)
   const [compressing, setCompressing] = useState(false)
+  const [cropSrc,     setCropSrc]     = useState(null)
+  const [pendingFile, setPendingFile] = useState(null)
 
   const lot      = obs.lotId ? lots.find(l => l.id === obs.lotId) : null
   const pinColor = lot?.color || '#9CA3AF'
@@ -60,33 +63,34 @@ export default function ObservationDetail({ observation, lots, onBack, onEdit, o
     loadData()
   }
 
-  const addPhoto = async (e) => {
+  const addPhoto = (e) => {
   const file = e.target.files[0]
   if (!file) return
+  e.target.value = ''
+  const url = URL.createObjectURL(file)
+  setPendingFile(file)
+  setCropSrc(url)
+}
+
+const handleCropApply = async (croppedBase64) => {
+  URL.revokeObjectURL(cropSrc)
+  setCropSrc(null)
   setCompressing(true)
   try {
-    console.log('1. Fichier sélectionné:', file.name, file.size, file.type)
-    
-    const compressed = await compressPhoto(file)
-    console.log('2. Compression OK:', compressed ? compressed.length + ' chars' : 'VIDE/NULL')
-    
-    if (!compressed || compressed.length < 100) {
-      throw new Error('Compression a retourné un résultat vide')
-    }
-
-    await Engine.createPhoto(obs.id, compressed, file.name)
-    console.log('3. Photo sauvegardée en base')
-
+    await Engine.createPhoto(obs.id, croppedBase64, pendingFile?.name || 'photo.jpg')
     await loadData()
-    console.log('4. Photos rechargées:', photos.length)
-
   } catch(err) {
-    console.error('ERREUR addPhoto:', err)
-    alert(`Erreur photo: ${err.message}`)
+    console.error('Photo error:', err)
   } finally {
     setCompressing(false)
-    e.target.value = ''
+    setPendingFile(null)
   }
+}
+
+const handleCropCancel = () => {
+  URL.revokeObjectURL(cropSrc)
+  setCropSrc(null)
+  setPendingFile(null)
 }
 
   const deletePhoto = async (id) => {
@@ -113,7 +117,13 @@ export default function ObservationDetail({ observation, lots, onBack, onEdit, o
           <button style={{ position: 'fixed', top: 18, right: 18, background: 'rgba(255,255,255,0.15)', color: 'white', border: 'none', borderRadius: '50%', width: 44, height: 44, fontSize: 22, cursor: 'pointer' }}>×</button>
         </div>
       )}
-
+{cropSrc && (
+  <CropModal
+    src={cropSrc}
+    onApply={handleCropApply}
+    onCancel={handleCropCancel}
+  />
+)}
       <div className="topbar">
         <button className="topbar-back" onClick={onBack}>← Observations</button>
         <div className="topbar-divider" />
